@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Blind Manifesto</title>
+<title>Party Political</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -146,7 +146,7 @@ details .reveal ul { margin: 6px 0 0; padding-left: 22px; }
 (function () {
   const P = window.PARTIES, T = window.TOPICS, KEYS = Object.keys(P);
   const LETTERS = ["A", "B", "C", "D", "E"];
-  const STORE = "blind-manifesto-v1";
+  const STORE = "party-political-v1";
   const app = document.getElementById("app");
   let s = load() || fresh();
 
@@ -171,7 +171,7 @@ details .reveal ul { margin: 6px 0 0; padding-left: 22px; }
     app.innerHTML = `
       <header class="stack">
         <span class="eyebrow">UK general election, July 2024</span>
-        <h1>Blind Manifesto</h1>
+        <h1>Party Political</h1>
         <p class="lede">Read what each party promised, with the party names hidden. Pick the set of policies you agree with most on each topic. At the end we show you whose policies you picked.</p>
       </header>
       <section class="howto" aria-label="How it works">

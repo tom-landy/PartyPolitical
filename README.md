@@ -1,4 +1,4 @@
-# Blind Manifesto
+# Party Political
 
 A classroom tool. Students read policies from the 2024 UK general election manifestos with party names hidden, pick the set they agree with on each topic, then see whose policies they chose.
 
