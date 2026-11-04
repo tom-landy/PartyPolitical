@@ -9,31 +9,37 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500&display=swap">
 <style>
-/* Layout: one ballot slip per screen. Deliberately no party colours anywhere
-   until the reveal, so the page itself never hints at a side. Ink on paper. */
+/* Layout: one ballot slip per screen. The accent is plum, a colour no major
+   party uses, so the page never hints at a side. Party colours only appear
+   on the results screen. */
 :root {
-  --paper: #f7f7f4;
+  --paper: #f8f4f7;
   --slip: #ffffff;
-  --ink: #1d1f24;
-  --muted: #5d6068;
-  --rule: #d6d7d2;
-  --pencil: #3a3d44;
+  --ink: #221a22;
+  --muted: #64596a;
+  --rule: #e1d6df;
+  --pencil: #3a2f3c;
   --focus: #2c55c8;
-  --mark-bg: #eceee8;
+  --mark-bg: #f3e6f0;
+  --accent: #7a2a72;
+  --accent-ink: #ffffff;
+  --accent-soft: #efdcec;
   --display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
   --body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #16171a; --slip: #1f2125; --ink: #ecece8; --muted: #a2a5ad;
-    --rule: #383b41; --pencil: #d9dad5; --focus: #8aa8ff; --mark-bg: #2a2d32;
+    --paper: #17131a; --slip: #221c25; --ink: #f0eaf0; --muted: #b3a8b6;
+    --rule: #3d3340; --pencil: #ddd3dd; --focus: #8aa8ff; --mark-bg: #34243a;
+    --accent: #e3a6dc; --accent-ink: #241322; --accent-soft: #3f2840;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --paper: #16171a; --slip: #1f2125; --ink: #ecece8; --muted: #a2a5ad;
-  --rule: #383b41; --pencil: #d9dad5; --focus: #8aa8ff; --mark-bg: #2a2d32;
+  --paper: #17131a; --slip: #221c25; --ink: #f0eaf0; --muted: #b3a8b6;
+  --rule: #3d3340; --pencil: #ddd3dd; --focus: #8aa8ff; --mark-bg: #34243a;
+  --accent: #e3a6dc; --accent-ink: #241322; --accent-soft: #3f2840;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -50,7 +56,10 @@ h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); font-weight: 800; letter-spacing: -0
 h2 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; }
 h3 { font-size: 1.15rem; font-weight: 600; }
 p { margin: 0; max-width: 65ch; }
-.eyebrow { font: 500 0.78rem/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.eyebrow { font: 500 0.78rem/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.hero { background: var(--accent); color: var(--accent-ink); border-radius: 8px; padding: clamp(22px, 5vw, 40px); }
+.hero .eyebrow, .hero .lede { color: var(--accent-ink); }
+.hero .lede { opacity: 0.88; }
 .lede { font-size: 1.15rem; color: var(--muted); }
 .stack { display: grid; gap: 14px; }
 button, select { font: inherit; color: inherit; }
@@ -58,10 +67,10 @@ button { cursor: pointer; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 
 .btn {
-  border: 2px solid var(--ink); background: var(--ink); color: var(--paper);
+  border: 2px solid var(--accent); background: var(--accent); color: var(--accent-ink);
   padding: 12px 22px; border-radius: 4px; font-weight: 700;
 }
-.btn.ghost { background: transparent; color: var(--ink); }
+.btn.ghost { background: transparent; color: var(--accent); }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .row.spread { justify-content: space-between; }
@@ -70,25 +79,25 @@ button { cursor: pointer; }
 .panel { background: var(--slip); border: 1px solid var(--rule); border-radius: 6px; padding: 22px; display: grid; gap: 16px; }
 .topics { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
 .check { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 4px; cursor: pointer; }
-.check input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--ink); flex: none; }
+.check input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--accent); flex: none; }
 .check small { display: block; color: var(--muted); font-size: 0.85rem; line-height: 1.35; }
 select { padding: 10px 12px; border: 1px solid var(--rule); border-radius: 4px; background: var(--slip); min-width: 0; max-width: 100%; }
 .howto { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
 .howto div { display: grid; gap: 6px; }
-.howto b { font-family: var(--mono); font-weight: 500; font-size: 0.8rem; color: var(--muted); letter-spacing: 0.06em; }
+.howto b { font-family: var(--mono); font-weight: 500; font-size: 0.8rem; color: var(--accent); letter-spacing: 0.06em; }
 
 /* Ballot */
 .progress { display: flex; gap: 4px; }
 .progress span { flex: 1; height: 6px; border-radius: 3px; background: var(--rule); }
-.progress span.done { background: var(--pencil); }
-.progress span.now { background: var(--ink); outline: 2px solid var(--ink); outline-offset: 1px; }
+.progress span.done { background: var(--accent); opacity: 0.55; }
+.progress span.now { background: var(--accent); outline: 2px solid var(--accent); outline-offset: 1px; }
 .ballot { display: grid; gap: 12px; }
 .slip {
   display: grid; grid-template-columns: 56px 1fr 64px; align-items: stretch;
   background: var(--slip); border: 1px solid var(--rule); border-radius: 6px;
   text-align: left; padding: 0; width: 100%; overflow: hidden;
 }
-.slip:hover { border-color: var(--pencil); }
+.slip:hover { border-color: var(--accent); }
 .slip .letter {
   font: 800 1.6rem/1 var(--display); display: grid; place-items: center;
   border-right: 1px dashed var(--rule); color: var(--muted);
@@ -100,8 +109,9 @@ select { padding: 10px 12px; border: 1px solid var(--rule); border-radius: 4px; 
   width: 38px; height: 38px; border: 2px solid var(--ink); border-radius: 2px;
   display: grid; place-items: center; font: 800 1.9rem/1 var(--display); font-style: normal;
 }
-.slip[aria-pressed="true"] { border: 2px solid var(--ink); background: var(--mark-bg); }
-.slip[aria-pressed="true"] .letter { color: var(--ink); }
+.slip[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--mark-bg); }
+.slip[aria-pressed="true"] .letter { color: var(--accent-ink); background: var(--accent); }
+.slip[aria-pressed="true"] .box i { border-color: var(--accent); color: var(--accent); }
 .slip[aria-pressed="true"] .box i::after { content: "✕"; }
 @media (max-width: 560px) {
   .slip { grid-template-columns: 1fr 56px; }
@@ -124,7 +134,7 @@ select { padding: 10px 12px; border: 1px solid var(--rule); border-radius: 4px; 
 @media (max-width: 560px) { table { min-width: 0; font-size: 0.92rem; } .pie-wrap { grid-template-columns: 1fr; justify-items: center; } .legend { width: 100%; } }
 .chip { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
 .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; }
-.compare { border-left: 4px solid var(--ink); padding: 4px 0 4px 16px; }
+.compare { border-left: 4px solid var(--accent); padding: 4px 0 4px 16px; }
 .table-wrap { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; min-width: 520px; }
 th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
@@ -133,7 +143,7 @@ details { background: var(--slip); border: 1px solid var(--rule); border-radius:
 details summary { cursor: pointer; font-weight: 700; }
 details .reveal { display: grid; gap: 14px; margin-top: 14px; }
 details .reveal ul { margin: 6px 0 0; padding-left: 22px; }
-.mine { font: 500 0.72rem var(--mono); letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid var(--ink); padding: 1px 6px; border-radius: 3px; margin-left: 6px; }
+.mine { font: 500 0.72rem var(--mono); letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid var(--accent); color: var(--accent); padding: 1px 6px; border-radius: 3px; margin-left: 6px; }
 .note { font-size: 0.9rem; color: var(--muted); }
 </style>
 </head>
@@ -169,7 +179,7 @@ details .reveal ul { margin: 6px 0 0; padding-left: 22px; }
 
   function start() {
     app.innerHTML = `
-      <header class="stack">
+      <header class="stack hero">
         <span class="eyebrow">UK general election, July 2024</span>
         <h1>Party Political</h1>
         <p class="lede">Read what each party promised, with the party names hidden. Pick the set of policies you agree with most on each topic. At the end we show you whose policies you picked.</p>
