@@ -1,0 +1,321 @@
+<title>Blind Manifesto</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one ballot slip per screen. Deliberately no party colours anywhere
+   until the reveal, so the page itself never hints at a side. Ink on paper. */
+:root {
+  --paper: #f7f7f4;
+  --slip: #ffffff;
+  --ink: #1d1f24;
+  --muted: #5d6068;
+  --rule: #d6d7d2;
+  --pencil: #3a3d44;
+  --focus: #2c55c8;
+  --mark-bg: #eceee8;
+  --display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #16171a; --slip: #1f2125; --ink: #ecece8; --muted: #a2a5ad;
+    --rule: #383b41; --pencil: #d9dad5; --focus: #8aa8ff; --mark-bg: #2a2d32;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #16171a; --slip: #1f2125; --ink: #ecece8; --muted: #a2a5ad;
+  --rule: #383b41; --pencil: #d9dad5; --focus: #8aa8ff; --mark-bg: #2a2d32;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink);
+  font: 17px/1.55 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 64px;
+}
+main { max-width: 980px; margin: 0 auto; display: grid; gap: 28px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.1; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; }
+h3 { font-size: 1.15rem; font-weight: 600; }
+p { margin: 0; max-width: 65ch; }
+.eyebrow { font: 500 0.78rem/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 1.15rem; color: var(--muted); }
+.stack { display: grid; gap: 14px; }
+button, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.btn {
+  border: 2px solid var(--ink); background: var(--ink); color: var(--paper);
+  padding: 12px 22px; border-radius: 4px; font-weight: 700;
+}
+.btn.ghost { background: transparent; color: var(--ink); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.row.spread { justify-content: space-between; }
+
+/* Start screen */
+.panel { background: var(--slip); border: 1px solid var(--rule); border-radius: 6px; padding: 22px; display: grid; gap: 16px; }
+.topics { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+.check { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 4px; cursor: pointer; }
+.check input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--ink); flex: none; }
+.check small { display: block; color: var(--muted); font-size: 0.85rem; line-height: 1.35; }
+select { padding: 10px 12px; border: 1px solid var(--rule); border-radius: 4px; background: var(--slip); min-width: 0; max-width: 100%; }
+.howto { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.howto div { display: grid; gap: 6px; }
+.howto b { font-family: var(--mono); font-weight: 500; font-size: 0.8rem; color: var(--muted); letter-spacing: 0.06em; }
+
+/* Ballot */
+.progress { display: flex; gap: 4px; }
+.progress span { flex: 1; height: 6px; border-radius: 3px; background: var(--rule); }
+.progress span.done { background: var(--pencil); }
+.progress span.now { background: var(--ink); outline: 2px solid var(--ink); outline-offset: 1px; }
+.ballot { display: grid; gap: 12px; }
+.slip {
+  display: grid; grid-template-columns: 56px 1fr 64px; align-items: stretch;
+  background: var(--slip); border: 1px solid var(--rule); border-radius: 6px;
+  text-align: left; padding: 0; width: 100%; overflow: hidden;
+}
+.slip:hover { border-color: var(--pencil); }
+.slip .letter {
+  font: 800 1.6rem/1 var(--display); display: grid; place-items: center;
+  border-right: 1px dashed var(--rule); color: var(--muted);
+}
+.slip ul { margin: 0; padding: 16px 18px 16px 34px; display: grid; gap: 6px; min-width: 0; }
+.slip li { padding-left: 2px; }
+.slip .box { display: grid; place-items: center; border-left: 1px dashed var(--rule); }
+.slip .box i {
+  width: 38px; height: 38px; border: 2px solid var(--ink); border-radius: 2px;
+  display: grid; place-items: center; font: 800 1.9rem/1 var(--display); font-style: normal;
+}
+.slip[aria-pressed="true"] { border: 2px solid var(--ink); background: var(--mark-bg); }
+.slip[aria-pressed="true"] .letter { color: var(--ink); }
+.slip[aria-pressed="true"] .box i::after { content: "✕"; }
+@media (max-width: 560px) {
+  .slip { grid-template-columns: 1fr 56px; }
+  .slip .letter { grid-column: 1 / -1; border-right: 0; border-bottom: 1px dashed var(--rule); padding: 8px 16px; justify-content: start; font-size: 1.1rem; }
+  .slip ul { padding: 12px 10px 12px 30px; }
+}
+.hint { color: var(--muted); font-size: 0.95rem; }
+
+/* Results */
+.bars { display: grid; gap: 12px; }
+.bar { display: grid; grid-template-columns: 170px 1fr 90px; gap: 12px; align-items: center; }
+.bar .track { height: 26px; background: var(--mark-bg); border-radius: 3px; overflow: hidden; }
+.bar .fill { height: 100%; border-radius: 3px; }
+.bar .n { white-space: nowrap; font: 500 0.95rem var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+@media (max-width: 560px) { table { min-width: 0; font-size: 0.92rem; } .bar { grid-template-columns: 1fr auto; } .bar .track { grid-column: 1 / -1; grid-row: 2; } }
+.chip { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
+.dot { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+.compare { border-left: 4px solid var(--ink); padding: 4px 0 4px 16px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 520px; }
+th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font: 500 0.75rem var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+details { background: var(--slip); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 18px; }
+details summary { cursor: pointer; font-weight: 700; }
+details .reveal { display: grid; gap: 14px; margin-top: 14px; }
+details .reveal ul { margin: 6px 0 0; padding-left: 22px; }
+.mine { font: 500 0.72rem var(--mono); letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid var(--ink); padding: 1px 6px; border-radius: 3px; margin-left: 6px; }
+.note { font-size: 0.9rem; color: var(--muted); }
+@media (prefers-reduced-motion: no-preference) {
+  .bar .fill { transition: width 600ms ease-out; }
+}
+</style>
+
+<main id="app" aria-live="polite"></main>
+
+<script src="policies.js"></script>
+<script>
+(function () {
+  const P = window.PARTIES, T = window.TOPICS, KEYS = Object.keys(P);
+  const LETTERS = ["A", "B", "C", "D", "E"];
+  const STORE = "blind-manifesto-v1";
+  const app = document.getElementById("app");
+  let s = load() || fresh();
+
+  function fresh() {
+    return { screen: "start", guess: "", topics: T.map(t => t.id), order: {}, picks: {}, step: 0 };
+  }
+  function load() { try { return JSON.parse(localStorage.getItem(STORE)); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(STORE, JSON.stringify(s)); } catch (e) {} }
+  function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  const esc = x => String(x).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const topic = id => T.find(t => t.id === id);
+
+  function render() {
+    save();
+    if (s.screen === "start") start();
+    else if (s.screen === "vote") vote();
+    else results();
+    window.scrollTo({ top: 0 });
+  }
+
+  function start() {
+    app.innerHTML = `
+      <header class="stack">
+        <span class="eyebrow">UK general election, July 2024</span>
+        <h1>Blind Manifesto</h1>
+        <p class="lede">Read what each party promised, with the party names hidden. Pick the set of policies you agree with most on each topic. At the end we show you whose policies you picked.</p>
+      </header>
+      <section class="howto" aria-label="How it works">
+        <div><b>STEP 1</b><p>Choose the topics you care about.</p></div>
+        <div><b>STEP 2</b><p>For each topic, read five sets of policies labelled A to E and mark the one you prefer.</p></div>
+        <div><b>STEP 3</b><p>See which parties wrote the policies you chose.</p></div>
+      </section>
+      <section class="panel">
+        <h3>Before you start: which party do you think you agree with most?</h3>
+        <p class="hint">Optional. We will compare your guess with your results.</p>
+        <select id="guess" aria-label="Your guess">
+          <option value="">I'm not sure</option>
+          ${KEYS.map(k => `<option value="${k}" ${s.guess === k ? "selected" : ""}>${P[k].name}</option>`).join("")}
+          <option value="none" ${s.guess === "none" ? "selected" : ""}>None of them</option>
+        </select>
+      </section>
+      <section class="panel">
+        <div class="row spread"><h3>Topics</h3>
+          <div class="row"><button class="btn ghost" id="all" type="button">Select all</button><button class="btn ghost" id="none" type="button">Clear</button></div>
+        </div>
+        <div class="topics">
+          ${T.map(t => `<label class="check"><input type="checkbox" id="t-${t.id}" value="${t.id}" ${s.topics.includes(t.id) ? "checked" : ""}><span>${esc(t.name)}<small>${esc(t.intro)}</small></span></label>`).join("")}
+        </div>
+        <div class="row spread">
+          <span class="hint" id="count"></span>
+          <button class="btn" id="go" type="button">Start</button>
+        </div>
+      </section>
+      <section class="stack note">
+        <p>The policies come from the 2024 manifestos of the five parties that stood across Great Britain: Conservative, Labour, Liberal Democrats, Reform UK and the Green Party. They are short summaries in plain English, with slogans and brand names taken out so you cannot tell whose they are. Health, education and housing are run separately in Scotland, Wales and Northern Ireland, so those policies mostly apply to England. The SNP, Plaid Cymru and Northern Ireland parties are not included.</p>
+        <p>The order of the sets and the letters change every time, so A is not always the same party.</p>
+      </section>`;
+    const boxes = [...app.querySelectorAll(".topics input")];
+    const go = app.querySelector("#go"), count = app.querySelector("#count");
+    const sync = () => {
+      s.topics = boxes.filter(b => b.checked).map(b => b.value);
+      count.textContent = s.topics.length ? `${s.topics.length} topic${s.topics.length > 1 ? "s" : ""} selected` : "Pick at least one topic";
+      go.disabled = !s.topics.length; save();
+    };
+    boxes.forEach(b => b.addEventListener("change", sync));
+    app.querySelector("#all").onclick = () => { boxes.forEach(b => b.checked = true); sync(); };
+    app.querySelector("#none").onclick = () => { boxes.forEach(b => b.checked = false); sync(); };
+    app.querySelector("#guess").onchange = e => { s.guess = e.target.value; save(); };
+    go.onclick = () => {
+      s.order = {}; s.picks = {}; s.step = 0;
+      s.topics = shuffle(s.topics);
+      s.topics.forEach(id => s.order[id] = shuffle(KEYS));
+      s.screen = "vote"; render();
+    };
+    sync();
+  }
+
+  function vote() {
+    const id = s.topics[s.step], t = topic(id), order = s.order[id], last = s.step === s.topics.length - 1;
+    app.innerHTML = `
+      <div class="progress" aria-hidden="true">${s.topics.map((x, i) => `<span class="${i < s.step ? "done" : i === s.step ? "now" : ""}"></span>`).join("")}</div>
+      <header class="stack">
+        <span class="eyebrow">Topic ${s.step + 1} of ${s.topics.length}</span>
+        <h2>${esc(t.name)}</h2>
+        <p class="lede">${esc(t.intro)} Read all five sets, then mark the one you agree with most.</p>
+      </header>
+      <div class="ballot" role="group" aria-label="Policy sets">
+        ${order.map((k, i) => `
+          <button class="slip" type="button" id="slip-${LETTERS[i]}" data-k="${k}" aria-pressed="${s.picks[id] === k}">
+            <span class="letter">${LETTERS[i]}</span>
+            <ul>${t.sets[k].map(b => `<li>${esc(b)}</li>`).join("")}</ul>
+            <span class="box"><i aria-hidden="true"></i></span>
+          </button>`).join("")}
+      </div>
+      <div class="row spread">
+        <button class="btn ghost" id="back" type="button">${s.step ? "Back" : "Change topics"}</button>
+        <div class="row">
+          <button class="btn ghost" id="skip" type="button">Skip this topic</button>
+          <button class="btn" id="next" type="button" ${s.picks[id] ? "" : "disabled"}>${last ? "See my results" : "Next topic"}</button>
+        </div>
+      </div>`;
+    app.querySelectorAll(".slip").forEach(b => b.onclick = () => {
+      s.picks[id] = b.dataset.k;
+      app.querySelectorAll(".slip").forEach(x => x.setAttribute("aria-pressed", x === b));
+      app.querySelector("#next").disabled = false; save();
+    });
+    const advance = () => { if (last) s.screen = "results"; else s.step++; render(); };
+    app.querySelector("#next").onclick = advance;
+    app.querySelector("#skip").onclick = () => { delete s.picks[id]; advance(); };
+    app.querySelector("#back").onclick = () => { if (s.step) s.step--; else s.screen = "start"; render(); };
+  }
+
+  function results() {
+    const answered = s.topics.filter(id => s.picks[id]);
+    const tally = Object.fromEntries(KEYS.map(k => [k, 0]));
+    answered.forEach(id => tally[s.picks[id]]++);
+    const ranked = KEYS.slice().sort((a, b) => tally[b] - tally[a]);
+    const top = tally[ranked[0]];
+    const winners = ranked.filter(k => tally[k] === top && top > 0);
+    const pct = n => answered.length ? Math.round(100 * n / answered.length) : 0;
+    const names = ks => ks.map(k => P[k].name).join(" and ");
+
+    let compare = "";
+    if (s.guess && answered.length) {
+      if (s.guess === "none") compare = `You thought you would not agree with any party. Your choices matched <b>${names(winners)}</b> most often.`;
+      else if (winners.includes(s.guess)) compare = `You guessed <b>${P[s.guess].name}</b>, and that is who you matched most${winners.length > 1 ? " (joint top)" : ""}.`;
+      else compare = `You guessed <b>${P[s.guess].name}</b>, but you picked their policies on ${tally[s.guess]} of ${answered.length} topics. You matched <b>${names(winners)}</b> most.`;
+    }
+
+    app.innerHTML = `
+      <header class="stack">
+        <span class="eyebrow">Your results</span>
+        <h2>${answered.length ? `You picked ${names(winners)} policies most often` : "You skipped every topic"}</h2>
+        <p class="lede">${answered.length ? `Based on ${answered.length} topic${answered.length > 1 ? "s" : ""}. ${winners.length > 1 ? "That is a tie." : ""}` : "Go back and choose a set of policies for at least one topic."}</p>
+      </header>
+      ${compare ? `<p class="compare">${compare}</p>` : ""}
+      <section class="panel">
+        <div class="bars">
+          ${ranked.map(k => `<div class="bar">
+            <span class="chip"><span class="dot" style="background:${P[k].colour}"></span>${P[k].name}</span>
+            <span class="track"><span class="fill" style="display:block;width:${pct(tally[k])}%;background:${P[k].colour}"></span></span>
+            <span class="n">${tally[k]} · ${pct(tally[k])}%</span>
+          </div>`).join("")}
+        </div>
+      </section>
+      <section class="stack">
+        <h3>Topic by topic</h3>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Topic</th><th>You picked</th><th>Whose policies</th></tr></thead>
+          <tbody>${s.topics.map(id => {
+            const k = s.picks[id], letter = k ? LETTERS[s.order[id].indexOf(k)] : null;
+            return `<tr><td>${esc(topic(id).name)}</td><td>${letter ? "Set " + letter : "Skipped"}</td><td>${k ? `<span class="chip"><span class="dot" style="background:${P[k].colour}"></span>${P[k].name}</span>` : "–"}</td></tr>`;
+          }).join("")}</tbody>
+        </table></div>
+      </section>
+      <section class="stack">
+        <h3>See every set with the party names shown</h3>
+        ${s.topics.map(id => {
+          const t = topic(id);
+          return `<details><summary>${esc(t.name)}</summary><div class="reveal">
+            ${s.order[id].map((k, i) => `<div><span class="chip"><span class="dot" style="background:${P[k].colour}"></span>Set ${LETTERS[i]}: ${P[k].name}</span>${s.picks[id] === k ? '<span class="mine">Your pick</span>' : ""}
+              <ul>${t.sets[k].map(b => `<li>${esc(b)}</li>`).join("")}</ul></div>`).join("")}
+          </div></details>`;
+        }).join("")}
+      </section>
+      <section class="panel stack">
+        <h3>Talk about it</h3>
+        <p>Were you surprised? Which topic mattered most to you? Did you agree with one party on some topics and a different party on others? Manifestos are promises: which of these do you think a party could actually deliver?</p>
+      </section>
+      <div class="row">
+        <button class="btn" id="again" type="button">Start again</button>
+        <button class="btn ghost" id="edit" type="button">Change my answers</button>
+      </div>
+      <p class="note">Manifestos: ${KEYS.map(k => `${P[k].name}, “${esc(P[k].manifesto)}”`).join("; ")}. The summaries are paraphrased and shortened, so check the full manifestos for detail.</p>`;
+    app.querySelector("#again").onclick = () => { s = fresh(); render(); };
+    app.querySelector("#edit").onclick = () => { s.screen = "vote"; s.step = 0; render(); };
+  }
+
+  render();
+})();
+</script>
