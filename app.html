@@ -4,37 +4,37 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500&display=swap">
 <style>
-/* Layout: one ballot slip per screen. The accent is plum, a colour no major
-   party uses, so the page never hints at a side. Party colours only appear
+/* Layout: one ballot slip per screen. Charcoal on warm stone, a neutral
+   accent so the page never hints at a side. Party colours only appear
    on the results screen. */
 :root {
-  --paper: #f8f4f7;
+  --paper: #f4f2ee;
   --slip: #ffffff;
-  --ink: #221a22;
-  --muted: #64596a;
-  --rule: #e1d6df;
-  --pencil: #3a2f3c;
+  --ink: #23262a;
+  --muted: #5f6266;
+  --rule: #dbd7cf;
+  --pencil: #3b3f44;
   --focus: #2c55c8;
-  --mark-bg: #f3e6f0;
-  --accent: #7a2a72;
+  --mark-bg: #ebe7df;
+  --accent: #33373c;
   --accent-ink: #ffffff;
-  --accent-soft: #efdcec;
+  --accent-soft: #e4e0d8;
   --display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
   --body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #17131a; --slip: #221c25; --ink: #f0eaf0; --muted: #b3a8b6;
-    --rule: #3d3340; --pencil: #ddd3dd; --focus: #8aa8ff; --mark-bg: #34243a;
-    --accent: #e3a6dc; --accent-ink: #241322; --accent-soft: #3f2840;
+    --paper: #171819; --slip: #212325; --ink: #eceae6; --muted: #a8a7a3;
+    --rule: #3a3c3f; --pencil: #d9d7d2; --focus: #8aa8ff; --mark-bg: #2d2f31;
+    --accent: #dedad2; --accent-ink: #1c1d1f; --accent-soft: #34363a;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --paper: #17131a; --slip: #221c25; --ink: #f0eaf0; --muted: #b3a8b6;
-  --rule: #3d3340; --pencil: #ddd3dd; --focus: #8aa8ff; --mark-bg: #34243a;
-  --accent: #e3a6dc; --accent-ink: #241322; --accent-soft: #3f2840;
+  --paper: #171819; --slip: #212325; --ink: #eceae6; --muted: #a8a7a3;
+  --rule: #3a3c3f; --pencil: #d9d7d2; --focus: #8aa8ff; --mark-bg: #2d2f31;
+  --accent: #dedad2; --accent-ink: #1c1d1f; --accent-soft: #34363a;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -104,7 +104,7 @@ select { padding: 10px 12px; border: 1px solid var(--rule); border-radius: 4px; 
   width: 38px; height: 38px; border: 2px solid var(--ink); border-radius: 2px;
   display: grid; place-items: center; font: 800 1.9rem/1 var(--display); font-style: normal;
 }
-.slip[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--mark-bg); }
+.slip[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--slip); }
 .slip[aria-pressed="true"] .letter { color: var(--accent-ink); background: var(--accent); }
 .slip[aria-pressed="true"] .box i { border-color: var(--accent); color: var(--accent); }
 .slip[aria-pressed="true"] .box i::after { content: "✕"; }
