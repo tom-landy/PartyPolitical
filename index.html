@@ -111,12 +111,17 @@ select { padding: 10px 12px; border: 1px solid var(--rule); border-radius: 4px; 
 .hint { color: var(--muted); font-size: 0.95rem; }
 
 /* Results */
-.bars { display: grid; gap: 12px; }
-.bar { display: grid; grid-template-columns: 170px 1fr 90px; gap: 12px; align-items: center; }
-.bar .track { height: 26px; background: var(--mark-bg); border-radius: 3px; overflow: hidden; }
-.bar .fill { height: 100%; border-radius: 3px; }
-.bar .n { white-space: nowrap; font: 500 0.95rem var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
-@media (max-width: 560px) { table { min-width: 0; font-size: 0.92rem; } .bar { grid-template-columns: 1fr auto; } .bar .track { grid-column: 1 / -1; grid-row: 2; } }
+.pie-wrap { display: grid; grid-template-columns: minmax(0, 260px) 1fr; gap: 28px; align-items: center; }
+.pie { width: 100%; max-width: 260px; height: auto; display: block; }
+.pie path { stroke: var(--slip); stroke-width: 2; }
+.pie path:hover { opacity: 0.85; }
+.pie .total { font: 800 2.4rem var(--display); fill: var(--ink); }
+.pie .sub { font: 500 0.7rem var(--mono); letter-spacing: 0.06em; fill: var(--muted); }
+.legend { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.legend li { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--rule); padding-bottom: 8px; }
+.legend li.zero { color: var(--muted); }
+.legend .n { white-space: nowrap; font: 500 0.95rem var(--mono); font-variant-numeric: tabular-nums; }
+@media (max-width: 560px) { table { min-width: 0; font-size: 0.92rem; } .pie-wrap { grid-template-columns: 1fr; justify-items: center; } .legend { width: 100%; } }
 .chip { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
 .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; }
 .compare { border-left: 4px solid var(--ink); padding: 4px 0 4px 16px; }
@@ -130,9 +135,6 @@ details .reveal { display: grid; gap: 14px; margin-top: 14px; }
 details .reveal ul { margin: 6px 0 0; padding-left: 22px; }
 .mine { font: 500 0.72rem var(--mono); letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid var(--ink); padding: 1px 6px; border-radius: 3px; margin-left: 6px; }
 .note { font-size: 0.9rem; color: var(--muted); }
-@media (prefers-reduced-motion: no-preference) {
-  .bar .fill { transition: width 600ms ease-out; }
-}
 </style>
 </head>
 <body>
@@ -257,6 +259,29 @@ details .reveal ul { margin: 6px 0 0; padding-left: 22px; }
     app.querySelector("#back").onclick = () => { if (s.step) s.step--; else s.screen = "start"; render(); };
   }
 
+  function pie(ranked, tally, total) {
+    const R = 100, r = 58, C = 110;
+    const pt = (a, rad) => [C + rad * Math.sin(a), C - rad * Math.cos(a)].map(v => v.toFixed(2)).join(" ");
+    let a0 = 0, slices = "";
+    const live = ranked.filter(k => tally[k]);
+    live.forEach(k => {
+      const frac = tally[k] / total, label = `${P[k].name}: ${tally[k]} of ${total} topics (${Math.round(frac * 100)}%)`;
+      if (live.length === 1) {
+        slices += `<circle cx="${C}" cy="${C}" r="${(R + r) / 2}" fill="none" stroke="${P[k].colour}" stroke-width="${R - r}"><title>${label}</title></circle>`;
+        return;
+      }
+      const a1 = a0 + frac * 2 * Math.PI, big = a1 - a0 > Math.PI ? 1 : 0;
+      slices += `<path d="M ${pt(a0, R)} A ${R} ${R} 0 ${big} 1 ${pt(a1, R)} L ${pt(a1, r)} A ${r} ${r} 0 ${big} 0 ${pt(a0, r)} Z" fill="${P[k].colour}"><title>${label}</title></path>`;
+      a0 = a1;
+    });
+    const desc = live.map(k => `${P[k].name} ${tally[k]}`).join(", ");
+    return `<svg class="pie" viewBox="0 0 220 220" role="img" aria-label="Pie chart of your picks: ${desc}">
+      ${total ? slices : `<circle cx="110" cy="110" r="79" fill="none" stroke="var(--rule)" stroke-width="42"></circle>`}
+      <text class="total" x="110" y="116" text-anchor="middle">${total}</text>
+      <text class="sub" x="110" y="138" text-anchor="middle">TOPICS</text>
+    </svg>`;
+  }
+
   function results() {
     const answered = s.topics.filter(id => s.picks[id]);
     const tally = Object.fromEntries(KEYS.map(k => [k, 0]));
@@ -282,12 +307,11 @@ details .reveal ul { margin: 6px 0 0; padding-left: 22px; }
       </header>
       ${compare ? `<p class="compare">${compare}</p>` : ""}
       <section class="panel">
-        <div class="bars">
-          ${ranked.map(k => `<div class="bar">
-            <span class="chip"><span class="dot" style="background:${P[k].colour}"></span>${P[k].name}</span>
-            <span class="track"><span class="fill" style="display:block;width:${pct(tally[k])}%;background:${P[k].colour}"></span></span>
-            <span class="n">${tally[k]} · ${pct(tally[k])}%</span>
-          </div>`).join("")}
+        <div class="pie-wrap">
+          ${pie(ranked, tally, answered.length)}
+          <ul class="legend">
+            ${ranked.map(k => `<li class="${tally[k] ? "" : "zero"}"><span class="chip"><span class="dot" style="background:${P[k].colour}"></span>${P[k].name}</span><span class="n">${tally[k]} · ${pct(tally[k])}%</span></li>`).join("")}
+          </ul>
         </div>
       </section>
       <section class="stack">
